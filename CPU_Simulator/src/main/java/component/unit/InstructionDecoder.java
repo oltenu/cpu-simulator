@@ -48,41 +48,31 @@ public class InstructionDecoder implements Unit {
     public void run() {
         extendOperation = ((Control) units.get("Control")).isExtendedOperation();
 
-        if (extendOperation) {
-            extendedImmediate = Character.toString(instruction.getInstruction().charAt(9))
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().charAt(9)
-                    + instruction.getInstruction().substring(9);
-        } else {
-            extendedImmediate = "000000000" + instruction.getInstruction().substring(9);
+        String instructionBits = instruction.getInstruction();
+        char fill = extendOperation ? instructionBits.charAt(9) : '0';
+        extendedImmediate = extend(instructionBits, 9, fill);
+
+        if (registerWrite) {
+            dataRegisters[Integer.parseInt(writeAddress, 2)] = writeData;
         }
 
-        if (registerWrite)
-            dataRegisters[Integer.parseInt(writeAddress, 2)] = writeData;
-
-        readData1 = dataRegisters[Integer.parseInt(instruction.getInstruction().substring(3, 6), 2)];
-        readData2 = dataRegisters[Integer.parseInt(instruction.getInstruction().substring(6, 9), 2)];
-        func = instruction.getInstruction().substring(13);
-        sa = instruction.getInstruction().charAt(12) == '1';
-        rt = instruction.getInstruction().substring(6, 9);
-        rd = instruction.getInstruction().substring(9, 12);
+        readData1 = dataRegisters[Integer.parseInt(instructionBits.substring(3, 6), 2)];
+        readData2 = dataRegisters[Integer.parseInt(instructionBits.substring(6, 9), 2)];
+        func = instructionBits.substring(13);
+        sa = instructionBits.charAt(12) == '1';
+        rt = instructionBits.substring(6, 9);
+        rd = instructionBits.substring(9, 12);
     }
 
     @Override
     public void update() {
         instruction = ((IfId) registers.get("IfId")).getInstruction();
         instruction.setInstructionStage(InstructionStage.DECODE);
-        writeAddress = ((MemWb) registers.get("MemWb")).getRd();
-        writeData = ((WriteBack) units.get("WriteBack")).getResult();
-        writeAddress = ((WriteBack) units.get("WriteBack")).getWriteAddress();
-        registerWrite = ((WriteBack) units.get("WriteBack")).isRegisterWrite();
-        ((WriteBack) units.get("WriteBack")).finishInstruction();
+        var writeBack = (WriteBack) units.get("WriteBack");
+        writeData = writeBack.getResult();
+        writeAddress = writeBack.getWriteAddress();
+        registerWrite = writeBack.isRegisterWrite();
+        writeBack.finishInstruction();
     }
 
     @Override
@@ -106,5 +96,11 @@ public class InstructionDecoder implements Unit {
     @Override
     public String toString() {
         return String.format("Instruction Decoder:%n readData1: %s%n readData2: %s%n extendedImmediate: %s%n func: %s%n sa: %s%n rd: %s%n rt: %s%n", readData1, readData2, extendedImmediate, func, sa, rd, rt);
+    }
+
+    private String extend(String value, int startIndex, char fill) {
+        String immediate = value.substring(startIndex);
+        int fillCount = ZERO_16.length() - immediate.length();
+        return String.valueOf(fill).repeat(fillCount) + immediate;
     }
 }
