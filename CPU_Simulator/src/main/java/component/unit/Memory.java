@@ -77,6 +77,6 @@ public class Memory implements Unit {
 
     @Override
     public String toString() {
-        return String.format("Memory:%n aluResOut: %s%n memoryData: %s%n", aluResultOut, memoryData);
+        return String.format("Memory:%n aluResultOut: %s%n memoryData: %s%n", aluResultOut, memoryData);
     }
 }
