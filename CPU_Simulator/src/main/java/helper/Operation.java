@@ -7,7 +7,7 @@ public class Operation {
 
         int sum = firstNumber + secondNumber;
 
-        return String.format("%016d", Integer.valueOf(Integer.toBinaryString(sum)));
+        return String.format("%16s", Integer.toBinaryString(sum & 0xFFFF)).replace(' ', '0');
     }
 
     public static String subtractBinary(String firstOperand, String secondOperand) {
@@ -16,7 +16,7 @@ public class Operation {
 
         int subtraction = firstNumber - secondNumber;
 
-        return String.format("%016d", Integer.valueOf(Integer.toBinaryString(subtraction)));
+        return String.format("%16s", Integer.toBinaryString(subtraction & 0xFFFF)).replace(' ', '0');
     }
 
     public static String shiftLeftLogic(String operand) {
@@ -37,7 +37,7 @@ public class Operation {
 
         int OR = firstNumber | secondNumber;
 
-        return String.format("%016d", Integer.valueOf(Integer.toBinaryString(OR)));
+        return String.format("%16s", Integer.toBinaryString(OR & 0xFFFF)).replace(' ', '0');
     }
 
     public static String AND(String firstOperand, String secondOperand) {
@@ -46,7 +46,7 @@ public class Operation {
 
         int AND = firstNumber & secondNumber;
 
-        return String.format("%016d", Integer.valueOf(Integer.toBinaryString(AND)));
+        return String.format("%16s", Integer.toBinaryString(AND & 0xFFFF)).replace(' ', '0');
     }
 
     public static String setOnLessThan(String readData1, String operand) {
